@@ -1,0 +1,84 @@
+
+# Importing packages
+import pyspark
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+
+# COMMAND ----------
+
+# Implementing the Joins in Databricks in PySpark
+
+spark = SparkSession.builder.appName('Joins PySpark').getOrCreate()
+
+Emp = [(1,"Ram",-2,"2019","11","M",2000), \
+    (2,"Pooja",2,"2011","30","F",5000), \
+    (3,"Shyam",1,"2011","20","M",2000), \
+    (4,"Madhavi",2,"2006","20","F",3000), \
+    (5,"Brown",2,"2011","30","",-2), \
+      (6,"Brown",2,"2011","40","",-2) \
+  ]
+
+Emp_Columns = ["emp_id","name","superior_emp_id","year_joined", \
+       "emp_dept_id","gender","salary"]
+
+Emp_Dataframe = spark.createDataFrame(data = Emp, schema = Emp_Columns)
+Emp_Dataframe.printSchema()
+Emp_Dataframe.show(truncate=False)
+
+Dept = [("Marketing",10), \
+    ("Finance",20), \
+    ("IT",30), \
+    ("Sales",40) \
+  ]
+Dept_Columns = ["dept_name","dept_id"]
+Dept_Dataframe = spark.createDataFrame(data = Dept, schema = Dept_Columns)
+Dept_Dataframe.printSchema()
+Dept_Dataframe.show(truncate=False)
+  
+# Using inner join 
+Emp_Dataframe.join(Dept_Dataframe, Emp_Dataframe.emp_dept_id ==  Dept_Dataframe.dept_id,"inner") \
+     .show(truncate=False)
+
+# Using outer join 
+Emp_Dataframe.join(Dept_Dataframe, Emp_Dataframe.emp_dept_id ==  Dept_Dataframe.dept_id,"outer") \
+    .show(truncate=False)
+
+# Using full join 
+Emp_Dataframe.join(Dept_Dataframe, Emp_Dataframe.emp_dept_id ==  Dept_Dataframe.dept_id,"full") \
+    .show(truncate=False)
+
+# Using full outer join 
+Emp_Dataframe.join(Dept_Dataframe, Emp_Dataframe.emp_dept_id ==  Dept_Dataframe.dept_id,"fullouter") \
+    .show(truncate=False)
+
+# Using left join 
+Emp_Dataframe.join(Dept_Dataframe, Emp_Dataframe.emp_dept_id ==  Dept_Dataframe.dept_id,"left") \
+    .show(truncate=False)
+
+# Using left outer join 
+Emp_Dataframe.join(Dept_Dataframe, Emp_Dataframe.emp_dept_id ==  Dept_Dataframe.dept_id,"leftouter") \
+   .show(truncate=False)
+
+# Using right join 
+Emp_Dataframe.join(Dept_Dataframe, Emp_Dataframe.emp_dept_id ==  Dept_Dataframe.dept_id,"right") \
+   .show(truncate=False)
+
+# Using right outer join
+Emp_Dataframe.join(Dept_Dataframe, Emp_Dataframe.emp_dept_id ==  Dept_Dataframe.dept_id,"rightouter") \
+   .show(truncate=False)
+
+# Using left semi join
+Emp_Dataframe.join(Dept_Dataframe, Emp_Dataframe.emp_dept_id ==  Dept_Dataframe.dept_id,"leftsemi") \
+   .show(truncate=False)
+   
+# Using left anti join  
+Emp_Dataframe.join(Dept_Dataframe, Emp_Dataframe.emp_dept_id ==  Dept_Dataframe.dept_id,"leftanti") \
+   .show(truncate=False)
+
+# Using self join
+Emp_Dataframe.alias("emp1").join(Emp_Dataframe.alias("emp2"), \
+    col("emp1.superior_emp_id") == col("emp2.emp_id"),"inner") \
+    .select(col("emp1.emp_id"),col("emp1.name"), \
+      col("emp2.emp_id").alias("superior_emp_id"), \
+      col("emp2.name").alias("superior_emp_name")) \
+   .show(truncate=False)
