@@ -1,0 +1,37 @@
+In PySpark, the Repartition() function is widely used and defined as to increase or decrease the Resilient Distributed Dataframe(RDD) or DataFrame partitions. 
+The Coalesce() widely used a dis defined to only decrease the number of the partitions efficiently. The PySpark repartition() and coalesce() functions are very expensive operations as they shuffle the data across many partitions, so the functions try to minimize using these as much as possible. The Resilient Distributed Datasets or RDDs are defined as the fundamental data structure of Apache PySpark. It was developed by The Apache Software Foundation. It is the immutable distributed collection of objects. In RDD, each dataset is divided into logical partitions which may be computed on different nodes of the cluster. The RDDs concept was launched in the year 2011. The Dataset is defined as a data structure in the SparkSQL that is strongly typed and is a map to the relational schema. It represents the structured queries with encoders and is an extension to dataframe API. Spark Dataset provides both the type safety and object-oriented programming interface. The Datasets concept was launched in the year 2015.
+
+
+
+import pyspark
+from pyspark.sql import SparkSession
+
+# COMMAND ----------
+
+# Implementing the Repartition() and Coalesce() functions in Databricks in PySpark
+
+spark = SparkSession.builder.appName('Repartition and Coalesce() PySpark') \
+        .master("local[5]").getOrCreate()
+
+dataframe = spark.range(0,20)
+print(dataframe.rdd.getNumPartitions())
+
+spark.conf.set("spark.sql.shuffle.partitions", "500")
+
+Rdd = spark.sparkContext.parallelize((0,20))
+print("From local[5]"+str(Rdd.getNumPartitions()))
+
+Rdd1 = spark.sparkContext.parallelize((0,25), 6)
+print("parallelize : "+str(Rdd1.getNumPartitions()))
+
+Rdd1.saveAsTextFile("/FileStore/tables/partition22")
+
+# Using repartition() function
+Rdd2 = Rdd1.repartition(5)
+print("Repartition size : " + str(Rdd2.getNumPartitions()))
+Rdd2.saveAsTextFile("/FileStore/tables/re-partition22")
+
+# Using coalesce() function
+Rdd3 = Rdd1.coalesce(5)
+print("Repartition size : " + str(Rdd3.getNumPartitions()))
+Rdd3.saveAsTextFile("/FileStore/tables/coalesce22")
