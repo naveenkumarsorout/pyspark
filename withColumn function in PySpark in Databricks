@@ -1,0 +1,53 @@
+import pyspark
+from pyspark.sql import SparkSession
+from pyspark.sql.types import MapType, StringType
+from pyspark.sql.functions import col, lit
+from pyspark.sql.types import StructType,StructField, StringType        
+
+# COMMAND ----------
+
+# Implementing the withColumn() function in Databricks in PySpark
+
+spark = SparkSession.builder.appName('withColumn() PySpark').getOrCreate()
+
+sample_data = [('Ram','','Aggarwal','1981-06-02','M',4000),
+  ('Shyam','Gupta','','2005-04-02','M',5000),
+  ('Amit','','Jain','1988-07-02','M',5000),
+  ('Pooja','Raju','Bansal','1977-08-03','F',5000),
+  ('Mary','Yadav','Brown','1970-04-15','F',-2)
+]
+
+sample_columns = ["firstname","middlename","lastname","dob","gender","salary"]
+dataframe = spark.createDataFrame(data = sample_data, schema = sample_columns)
+dataframe.printSchema()
+dataframe.show(truncate=False)
+
+# Changing datatype using withColumn() function
+dataframe2 = dataframe.withColumn("salary",col("salary").cast("Integer"))
+dataframe2.printSchema()
+dataframe2.show(truncate=False)
+
+# Updating value of an existing column
+dataframe3 = dataframe.withColumn("salary",col("salary")*100)
+dataframe3.printSchema()
+dataframe3.show(truncate=False) 
+
+# Creating new column using existing one
+dataframe4 = dataframe.withColumn("Copied_Column",col("salary")* -1)
+dataframe4.printSchema()
+
+# Adding new column using withColumn() function
+dataframe5 = dataframe.withColumn("Country", lit("USA"))
+dataframe5.printSchema()
+
+dataframe6 = dataframe.withColumn("Country", lit("USA")) \
+   .withColumn("anotherColumn",lit("anotherValue"))
+dataframe6.printSchema()
+
+# Renaming a column
+dataframe.withColumnRenamed("gender","sex") \
+  .show(truncate=False) 
+  
+# Dropping a column from PySpark Datafrmae
+dataframe4.drop("Copied_Column") \
+.show(truncate=False) 
